@@ -11,6 +11,8 @@ import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { gql, useQuery } from "@apollo/client";
 import type { Link as LinkType } from "@prisma/client";
+import { links } from "@/data/links";
+import { Badge } from "../ui/badge";
 
 const AllLinkQuery = gql`
   query {
@@ -40,14 +42,18 @@ export const HomePage = () => {
       </div>
     );
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-5">
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-5 mt-5">
       {data.links.map((item: LinkType) => (
-        <Card key={item.id}>
+        <Card className="bg-zinc-900 border-zinc-800 hover:border-zinc-500 transition-all duration-300 ease-in-out" key={item.id}>
           <CardHeader className="rounded-lg">
-            <img className="rounded-lg" src={item.imageUrl} alt={item.title} />
+            <img className="rounded-lg border border-zinc-600 border-dashed aspect-square object-cover" src={item.imageUrl} alt={item.title} />
           </CardHeader>
-          <CardContent>
-            <p>Card Content</p>
+          <CardContent className="space-y-3">
+            <div className="flex justify-between items-center">
+              <h1>{item.title}</h1>
+              <Badge>{item.category}</Badge>
+            </div>
+            <p>{item.description}</p>
           </CardContent>
           <CardFooter>
             <Link

@@ -24,12 +24,12 @@ export const links = [
     title: "TailwindCSS",
     url: "https://tailwindcss.com",
   },
-//   {
-//     category: "Open Source",
-//     description: "GraphQL implementation ",
-//     id: 4,
-//     imageUrl: "https://www.apollographql.com/apollo-home.jpg",
-//     title: "Apollo GraphQL",
-//     url: "https://apollographql.com",
-//   },
+  {
+    category: "Open Source",
+    description: "Single Page Web Application JS Library",
+    id: 4,
+    imageUrl: "https://react.dev/images/home/conf2019/cover.svg",
+    title: "React.js",
+    url: "https://react.dev",
+  },
 ];
