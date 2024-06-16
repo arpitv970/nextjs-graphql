@@ -1,34 +1,35 @@
 "use client";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import Link from "next/link";
-import { ExternalLink } from "lucide-react";
 import { gql, useQuery } from "@apollo/client";
 import type { Link as LinkType } from "@prisma/client";
-import { links } from "@/data/links";
-import { Badge } from "../ui/badge";
+import { LinkCard } from "./link-card";
+import { Button } from "../ui/button";
 
 const AllLinkQuery = gql`
-  query {
-    links {
-      id
-      title
-      url
-      description
-      imageUrl
-      category
+  query allLinkQuery($first: Int, $after: ID) {
+    links(first: $first, after: $after) {
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      edges {
+        cursor
+        node {
+          id
+          title
+          imageUrl
+          url
+          description
+          category
+        }
+      }
     }
   }
 `;
 
 export const HomePage = () => {
-  const { data, loading, error } = useQuery(AllLinkQuery);
+  const { data, loading, error, fetchMore } = useQuery(AllLinkQuery, {
+    variables: { first: 2 },
+  });
   if (loading)
     return (
       <div className="w-full h-[80vh] flex justify-center items-center text-center m-auto">
@@ -41,31 +42,38 @@ export const HomePage = () => {
         <p>Error Occured... {error.message}</p>
       </div>
     );
+
+  const { endCursor, hasNextPage } = data.links.pageInfo;
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-5 mt-5">
-      {data.links.map((item: LinkType) => (
-        <Card className="bg-zinc-900 border-zinc-800 hover:border-zinc-500 transition-all duration-300 ease-in-out" key={item.id}>
-          <CardHeader className="rounded-lg">
-            <img className="rounded-lg border border-zinc-600 border-dashed aspect-square object-cover" src={item.imageUrl} alt={item.title} />
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex justify-between items-center">
-              <h1>{item.title}</h1>
-              <Badge>{item.category}</Badge>
-            </div>
-            <p>{item.description}</p>
-          </CardContent>
-          <CardFooter>
-            <Link
-              href={item.url}
-              className="flex gap-3 justify-center items-start mr-auto ml-0 my-0"
-            >
-              {item.url.replace(/(^\w+:|^)\/\//, "")}
-              <ExternalLink />
-            </Link>
-          </CardFooter>
-        </Card>
-      ))}
+    <div className="space-y-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-5">
+        {data?.links.edges.map(({ node }: { node: LinkType }) => (
+          <LinkCard key={node.id} {...node} />
+        ))}
+      </div>
+      {hasNextPage ? (
+        <Button
+          onClick={() => {
+            fetchMore({
+              variables: { after: endCursor },
+              updateQuery: (prev, { fetchMoreResult }) => {
+                fetchMoreResult.links.edges = [
+                  ...prev.links.edges,
+                  ...fetchMoreResult.links.edges,
+                ];
+                return fetchMoreResult;
+              },
+            });
+          }}
+        >
+          More
+        </Button>
+      ) : (
+        <p className="my-10 text-center font-medium">
+          {`You've reached the end!`}
+        </p>
+      )}
     </div>
   );
 };
