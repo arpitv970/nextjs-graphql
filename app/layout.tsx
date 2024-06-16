@@ -19,14 +19,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <GlobalProvider>
-        <body className={inter.className}>
+      <body className={inter.className}>
+        <GlobalProvider>
           <Header />
           <div className="flex justify-center items-center mx-auto">
             <div className="w-3/4">{children}</div>
           </div>
-        </body>
-      </GlobalProvider>
+        </GlobalProvider>
+      </body>
     </html>
   );
 }
